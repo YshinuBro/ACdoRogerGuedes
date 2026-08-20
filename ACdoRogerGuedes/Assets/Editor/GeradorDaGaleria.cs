@@ -17,7 +17,8 @@ public static class GeradorDaGaleria
     [MenuItem("O Vigia/1. Criar cena da fase (01_Fase)", false, 20)]
     public static void CriarCenaDaFase()
     {
-        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        // Em modo batch nao ha ninguem para responder o dialogo de salvar.
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
         Scene cena = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         Gerar();

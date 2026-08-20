@@ -38,7 +38,8 @@ public static class GeradorDoMenu
     [MenuItem("O Vigia/3. Criar cena do menu (00_Menu)", false, 22)]
     public static void CriarCenaDoMenu()
     {
-        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        // Em modo batch nao ha ninguem para responder o dialogo de salvar.
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
         Scene cena = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         Gerar();

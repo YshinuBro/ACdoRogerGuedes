@@ -58,14 +58,22 @@ Para mudar qualquer um deles, edite as constantes e rode
 
 Nada disso pode ser feito por script — são cliques no Editor.
 
-### 1. Instalar o Google Cardboard XR Plugin
+### 1. Google Cardboard XR Plugin — já está no repositório
 
-O pacote **não está instalado** no projeto ainda (confira em `Packages/manifest.json`).
+O pacote vive **embutido** em `Packages/com.google.xr.cardboard/` (versão 1.34.0).
+Pacote embutido é detectado sozinho pela Unity: não precisa fazer nada no Package
+Manager, e não há entrada dele no `manifest.json`.
 
-1. `Window > Package Manager`
-2. Botão **+** no canto superior esquerdo > **Add package from git URL...**
-3. Cole: `https://github.com/googlevr/cardboard-xr-plugin.git`
-4. **Add** e espere importar
+Foi feito assim de propósito, em vez do Git URL: o repositório fica autossuficiente,
+então quem clonar não depende de rede nem de acesso ao GitHub para compilar.
+
+Os binários de iOS (`Runtime/iOS`, 63 MB) foram removidos — o projeto é Android-only
+e o `.gitattributes` não cobre `.a`/`.aar` com LFS, então esse arquivo entraria cru
+no histórico do Git.
+
+Na primeira vez que abrir o projeto, a Unity vai baixar sozinha as dependências
+declaradas pelo pacote: `com.unity.xr.management` e `com.unity.xr.legacyinputhelpers`.
+Isso precisa de internet, mas só uma vez.
 
 ### 2. Trocar a plataforma para Android
 
@@ -94,7 +102,9 @@ O pacote **não está instalado** no projeto ainda (confira em `Packages/manifes
 **Other Settings > Configuration**
 - **Scripting Backend**: IL2CPP
 - **Target Architectures**: marcar **ARM64**, desmarcar ARMv7
-- **Minimum API Level**: Android 7.0 (API 24) ou maior
+- **Minimum API Level**: Android 8.0 (API 26). Não pode ser menor: o `GfxPluginCardboard.aar`
+  declara 26 no manifesto dele, e o Gradle recusa o merge se o app prometer rodar em
+  versão mais antiga que uma biblioteca sua. O celular precisa ser Android 8 ou superior.
 - **Package Name**: algo como `com.suadupla.ovigia`
 
 **Resolution and Presentation**
@@ -166,7 +176,7 @@ Cerca de 30 objetos, todos cubos — bem abaixo do teto de 50 mil triângulos.
 | Nome dos integrantes | pronto (6 nomes, JP e Maria Letícia em destaque) |
 | Botão para iniciar o jogo | pronto (cubo verde, mira + botão) |
 | Instruções básicas de controle | pronto (painel do menu) |
-| Uso do player VR/Cardboard | **depende dos passos 1 a 4 acima** |
+| Uso do player VR/Cardboard | pacote no repo; falta ligar no XR Plug-in Management |
 | Movimentação com o stick do gamepad | pronto |
 | Visão em primeira pessoa pelo movimento do celular | **depende dos passos 1 a 4 acima** |
 | Uso da retícula para mirar | pronto (muda de cor sobre o alvo) |
