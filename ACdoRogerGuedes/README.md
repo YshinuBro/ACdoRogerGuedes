@@ -40,16 +40,17 @@ Os itens **2** e **4** do menu regeram cenário e menu **na cena que já está a
 sem criar arquivo novo. Podem ser rodados quantas vezes quiser: apagam o grupo anterior
 (`GaleriaGerada` / `MenuGerado`) antes de recriar.
 
-### Antes de entregar: trocar os nomes
+### Créditos
 
-Em `Assets/Editor/GeradorDoMenu.cs`, linha 17:
+As constantes ficam no topo de `Assets/Editor/GeradorDoMenu.cs`:
 
-```csharp
-private const string INTEGRANTES = "Integrantes: Nome do Aluno 1  -  Nome do Aluno 2";
-```
+- **Integrantes** — JP e Maria Letícia em fonte 54, mais Luigi, Maria Julia,
+  Rafael e Lucca Lago logo abaixo em fonte 42. Todos contam como integrantes;
+  o tamanho é que separa quem fez mais de quem fez menos.
+- **Participação EXTREMAMENTE Especial** — a piada
 
-Troque pelos nomes reais e rode **O Vigia > 4. Gerar menu** com a `00_Menu` aberta,
-depois salve a cena (Ctrl+S).
+Para mudar qualquer um deles, edite as constantes e rode
+**O Vigia > 4. Gerar menu** com a `00_Menu` aberta, depois salve a cena (Ctrl+S).
 
 ---
 
@@ -162,7 +163,7 @@ Cerca de 30 objetos, todos cubos — bem abaixo do teto de 50 mil triângulos.
 |---|---|
 | Tela de entrada antes da fase (build index 0) | pronto |
 | Nome do jogo na tela de entrada | pronto |
-| Nome dos integrantes | **placeholder — trocar em `GeradorDoMenu.cs`** |
+| Nome dos integrantes | pronto (6 nomes, JP e Maria Letícia em destaque) |
 | Botão para iniciar o jogo | pronto (cubo verde, mira + botão) |
 | Instruções básicas de controle | pronto (painel do menu) |
 | Uso do player VR/Cardboard | **depende dos passos 1 a 4 acima** |
