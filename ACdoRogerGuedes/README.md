@@ -22,23 +22,46 @@ Os quatro botões são aceitos porque o mapeamento muda de controle para control
 
 ---
 
-## Como montar as cenas
+## As cenas
 
-As duas cenas são geradas por Editor Script. Não edite as cenas à mão.
+O jogo tem duas cenas prontas e versionadas. Abra qualquer uma e aperte Play.
 
-Abra o projeto na Unity e use o menu **O Vigia** na barra superior, nesta ordem:
+| Cena | Build index | O que é |
+|---|---|---|
+| `Assets/Scenes/00_Menu.unity` | 0 | tela de entrada: título, integrantes, instruções e o botão iniciar |
+| `Assets/Scenes/01_Fase.unity` | 1 | a galeria jogável: 5 relíquias, a porta de saída e o Vigia |
 
-1. **O Vigia > 1. Criar cena da fase (01_Fase)**
-2. **O Vigia > 3. Criar cena do menu (00_Menu)**
-3. **O Vigia > 5. Registrar cenas no Build Settings**
+A `01_Fase` tem cerca de 40 objetos — chão, quatro paredes, o bloco central, duas
+vitrines, cinco pedestais com suas relíquias e luzes, a porta, o player VR e o Vigia.
+Tudo cubo padrão, bem abaixo do teto de 50 mil triângulos que um celular aguenta
+renderizando duas vezes por frame.
 
-Isso cria `Assets/Scenes/01_Fase.unity` e `Assets/Scenes/00_Menu.unity`, cria a layer
-`Interactive` sozinho, gera os materiais em `Assets/Materiais/` e deixa o Build Settings
-com `00_Menu` no índice 0 e `01_Fase` no índice 1.
+### Como as cenas foram construídas
 
-Os itens **2** e **4** do menu regeram cenário e menu **na cena que já está aberta**,
-sem criar arquivo novo. Podem ser rodados quantas vezes quiser: apagam o grupo anterior
-(`GaleriaGerada` / `MenuGerado`) antes de recriar.
+O cenário não foi montado arrastando cubos no Editor: ele é descrito em código, em
+`Assets/Editor/GeradorDaGaleria.cs` e `GeradorDoMenu.cs`, e montado pelo menu
+**O Vigia** na barra superior da Unity.
+
+A vantagem é reprodutibilidade. Um ajuste de layout — mover uma relíquia, mudar a
+largura do corredor, redimensionar o painel do menu — é uma linha no gerador e um
+clique, em vez de posicionar objeto por objeto e torcer para não esquecer nenhum.
+Também garante que os dois integrantes gerem exatamente a mesma cena, sem divergência
+de quem arrastou o quê.
+
+| Item do menu | O que faz |
+|---|---|
+| 1. Criar cena da fase | cria e salva a `01_Fase` do zero |
+| 2. Gerar cenário | regera a fase na cena já aberta |
+| 3. Criar cena do menu | cria e salva a `00_Menu` do zero |
+| 4. Gerar menu | regera o menu na cena já aberta |
+| 5. Registrar cenas no Build Settings | põe `00_Menu` no índice 0 e `01_Fase` no 1 |
+
+Os geradores também criam a layer `Interactive`, os materiais em `Assets/Materiais/`
+e a iluminação. Podem rodar quantas vezes quiser: apagam o grupo anterior
+(`GaleriaGerada` / `MenuGerado`) antes de recriar, então nunca duplicam.
+
+**Como as cenas são geradas, edite-as pelos scripts, não à mão** — uma edição manual
+se perde na próxima vez que alguém rodar o gerador.
 
 ### Créditos
 
