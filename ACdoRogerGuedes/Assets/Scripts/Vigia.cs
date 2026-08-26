@@ -47,9 +47,9 @@ public class Vigia : MonoBehaviour
 
     [Header("Destravamento")]
     [Tooltip("Quanto tempo empurrando sem sair do lugar antes de tentar desviar.")]
-    [SerializeField] private float tempoParaDestravar = 0.5f;
+    [SerializeField] private float tempoParaDestravar = 0.3f;
     [Tooltip("Quanto tempo anda de lado ao desviar.")]
-    [SerializeField] private float duracaoDoDesvio = 0.7f;
+    [SerializeField] private float duracaoDoDesvio = 1.0f;
 
     private CharacterController controlador;
     private float velocidadeVertical;
@@ -59,6 +59,9 @@ public class Vigia : MonoBehaviour
     private float tempoTravado;
     private float tempoDesviando;
     private float ladoDoDesvio = 1f;
+
+    private int sentido = 1;          // +1 ou -1: para que lado esta dando a volta
+    private int cantoDoJogador = -1;  // ultimo canto de referencia do jogador
 
     private void Awake()
     {
@@ -177,6 +180,10 @@ public class Vigia : MonoBehaviour
     }
 
     // Vizinho de 'origem' no sentido que chega antes ao canto do jogador.
+    //
+    // O sentido da volta so e reescolhido quando o jogador muda de canto. Sem
+    // isso, um passo do jogador dentro do mesmo trecho podia inverter o sentido
+    // no meio de uma curva, e a estatua ficava indo e voltando na quina.
     private int VizinhoNaDirecaoDoJogador(int origem)
     {
         int dele = CantoMaisProximo(alvo.position);
@@ -184,10 +191,15 @@ public class Vigia : MonoBehaviour
 
         if (origem == dele) return dele;
 
-        int horario = (dele - origem + n) % n;
-        int antiHorario = (origem - dele + n) % n;
+        if (dele != cantoDoJogador)
+        {
+            int horario = (dele - origem + n) % n;
+            int antiHorario = (origem - dele + n) % n;
+            sentido = horario <= antiHorario ? 1 : -1;
+            cantoDoJogador = dele;
+        }
 
-        return horario <= antiHorario ? (origem + 1) % n : (origem - 1 + n) % n;
+        return ((origem + sentido) % n + n) % n;
     }
 
     private int CantoMaisProximo(Vector3 ponto)
