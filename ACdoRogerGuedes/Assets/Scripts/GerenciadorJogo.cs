@@ -37,6 +37,7 @@ public class GerenciadorJogo : MonoBehaviour
     private bool trocandoDeCena;
     private bool voltarParaOMenu;
 
+    public int Coletadas { get { return coletadas; } }
     public bool TodasColetadas { get { return coletadas >= totalDeReliquias; } }
     public bool JogoTerminou { get { return trocandoDeCena; } }
     public int Faltando { get { return Mathf.Max(0, totalDeReliquias - coletadas); } }

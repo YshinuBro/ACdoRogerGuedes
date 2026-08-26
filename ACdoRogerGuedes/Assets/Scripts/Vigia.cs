@@ -15,7 +15,14 @@ public class Vigia : MonoBehaviour
     [SerializeField] private Transform cabecaDoJogador;
 
     [Header("Perseguicao")]
-    [SerializeField] private float velocidade = 1.3f;
+    // Mais rapida que o jogador (2.2) de proposito. Com uma estatua mais lenta
+    // da para simplesmente correr e nunca olhar para tras, e a mecanica inteira
+    // vira enfeite. Sendo mais rapida, olhar deixa de ser opcao.
+    [SerializeField] private float velocidade = 2.6f;
+
+    [Tooltip("Quanto ela acelera a cada reliquia coletada. A tensao sobe justo quando falta atravessar ate a porta.")]
+    [SerializeField] private float ganhoPorReliquia = 0.15f;
+
     [SerializeField] private float distanciaDeToque = 1.3f;
     [SerializeField] private float gravidade = -12f;
 
@@ -63,6 +70,17 @@ public class Vigia : MonoBehaviour
     private int sentido = 1;          // +1 ou -1: para que lado esta dando a volta
     private int cantoDoJogador = -1;  // ultimo canto de referencia do jogador
 
+    // Acelera conforme o jogador coleta: quanto menos falta para escapar,
+    // mais perto ela chega.
+    private float VelocidadeAtual
+    {
+        get
+        {
+            int coletadas = GerenciadorJogo.Instancia != null ? GerenciadorJogo.Instancia.Coletadas : 0;
+            return velocidade + coletadas * ganhoPorReliquia;
+        }
+    }
+
     private void Awake()
     {
         controlador = GetComponent<CharacterController>();
@@ -93,7 +111,7 @@ public class Vigia : MonoBehaviour
             if (direcao.sqrMagnitude > 0.001f)
             {
                 queriaAndar = true;
-                passo = direcao.normalized * velocidade;
+                passo = direcao.normalized * VelocidadeAtual;
                 Encarar(direcao);
             }
         }
@@ -132,7 +150,7 @@ public class Vigia : MonoBehaviour
             return;
         }
 
-        float esperado = velocidade * Time.deltaTime * 0.4f;
+        float esperado = VelocidadeAtual * Time.deltaTime * 0.4f;
         if (andou < esperado) tempoTravado += Time.deltaTime;
         else tempoTravado = 0f;
 

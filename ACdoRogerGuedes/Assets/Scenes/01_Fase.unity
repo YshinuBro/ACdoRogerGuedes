@@ -2201,7 +2201,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   alvo: {fileID: 266151924}
   cabecaDoJogador: {fileID: 1577871401}
-  velocidade: 1.3
+  velocidade: 2.6
+  ganhoPorReliquia: 0.15
   distanciaDeToque: 1.3
   gravidade: -12
   anguloDeVisao: 65
