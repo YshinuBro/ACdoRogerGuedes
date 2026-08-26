@@ -260,4 +260,44 @@ public static class UtilGerador
 
         Debug.Log("Build Settings: 00_Menu (indice 0) e 01_Fase (indice 1).");
     }
+
+    // ---------------------------------------------------------------- cabeca VR
+    // Veio do antigo GeradorDaGaleria, que foi substituido pela cena montada
+    // com os modelos do Blender. O gerador do menu ainda precisa dela.
+    // A camera nunca e rotacionada por codigo: quem gira e o head tracking.
+    public static Transform CriarCabecaVR(Transform pai, bool comHud, GameObject gerenciador)
+    {
+        GameObject go = Vazio("Camera", pai, new Vector3(0f, 0.65f, 0f));
+        go.tag = "MainCamera";
+
+        Camera camera = go.AddComponent<Camera>();
+        camera.clearFlags = CameraClearFlags.SolidColor;
+        camera.backgroundColor = new Color(0.02f, 0.02f, 0.03f);
+        camera.nearClipPlane = 0.05f;
+        camera.farClipPlane = 60f;
+        go.AddComponent<AudioListener>();
+
+        Material corDaReticula = SemLuz("MatReticula", Color.white);
+        GameObject reticula = Quadrado("Reticula", go.transform, new Vector3(0f, 0f, 1.5f), Vector3.one * 0.022f, corDaReticula);
+
+        InteracaoReticula interacao = go.AddComponent<InteracaoReticula>();
+        Campo(interacao, "rendererDaReticula", reticula.GetComponent<Renderer>());
+        CampoInt(interacao, "camadasDaMira", ~0);
+
+        if (comHud && gerenciador != null) Hud(go.transform, gerenciador);
+
+        return go.transform;
+    }
+
+    private static void Hud(Transform cabeca, GameObject gerenciador)
+    {
+        Canvas hud = Painel("HUD", cabeca, new Vector3(0f, 0f, 2f), new Vector2(1600f, 900f), 0.0015f);
+
+        Text contador = Texto("TextoContador", hud.transform, new Vector2(0f, 380f), new Vector2(1500f, 120f), "Relíquias: 0 / 5", 60, new Color(1f, 0.9f, 0.6f));
+        Text mensagem = Texto("TextoMensagem", hud.transform, new Vector2(0f, -330f), new Vector2(1500f, 300f), "", 56, Color.white);
+
+        GerenciadorJogo cerebro = gerenciador.GetComponent<GerenciadorJogo>();
+        Campo(cerebro, "textoContador", contador);
+        Campo(cerebro, "textoMensagem", mensagem);
+    }
 }

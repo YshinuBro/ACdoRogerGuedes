@@ -106,7 +106,7 @@ public static class GeradorDoMenu
     {
         // Sem CharacterController e sem MovimentoPlayer: no menu ninguem anda.
         GameObject player = UtilGerador.Vazio("Player", raiz, new Vector3(0f, 0.95f, 0f));
-        GeradorDaGaleria.CriarCabecaVR(player.transform, false, null);
+        UtilGerador.CriarCabecaVR(player.transform, false, null);
     }
 
     // As alturas sao em pixels do canvas: 0.0025 de escala a 4 m deixa
