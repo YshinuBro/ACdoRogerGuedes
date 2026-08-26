@@ -31,34 +31,40 @@ O jogo tem duas cenas prontas e versionadas. Abra qualquer uma e aperte Play.
 | `Assets/Scenes/00_Menu.unity` | 0 | tela de entrada: título, integrantes, instruções e o botão iniciar |
 | `Assets/Scenes/01_Fase.unity` | 1 | a galeria jogável: 5 relíquias, a porta de saída e o Vigia |
 
-A `01_Fase` tem cerca de 40 objetos — chão, quatro paredes, o bloco central, duas
-vitrines, cinco pedestais com suas relíquias e luzes, a porta, o player VR e o Vigia.
-Tudo cubo padrão, bem abaixo do teto de 50 mil triângulos que um celular aguenta
-renderizando duas vezes por frame.
+A `01_Fase` é montada com os modelos de `Assets/Modelos/`, feitos no Blender: a
+galeria, os pedestais, as vitrines, a porta, o Vigia e as cinco relíquias — cálice,
+máscara, coroa, ânfora e estatueta, cada uma com forma própria. A cena inteira fica em
+**2.630 triângulos**, bem abaixo do teto de 50 mil que um celular aguenta renderizando
+duas vezes por frame.
 
-### Como as cenas foram construídas
+### Sobre os modelos
 
-O cenário não foi montado arrastando cubos no Editor: ele é descrito em código, em
-`Assets/Editor/GeradorDaGaleria.cs` e `GeradorDoMenu.cs`, e montado pelo menu
-**O Vigia** na barra superior da Unity.
+Os FBX vêm do Blender em Z para cima, e a Unity usa Y. O importador resolve isso
+sozinho colocando uma rotação de 270° no transform raiz do prefab.
 
-A vantagem é reprodutibilidade. Um ajuste de layout — mover uma relíquia, mudar a
-largura do corredor, redimensionar o painel do menu — é uma linha no gerador e um
-clique, em vez de posicionar objeto por objeto e torcer para não esquecer nenhum.
-Também garante que os dois integrantes gerem exatamente a mesma cena, sem divergência
-de quem arrastou o quê.
+Isso tem uma consequência prática: **se você instanciar um modelo por código e zerar a
+rotação, ele deita**. Não é defeito do modelo, é a conversão de eixos sendo apagada.
+Os pivôs ficam na base, então basta posicionar no Y do chão que a peça assenta.
+
+### O menu ainda é gerado por código
+
+A `00_Menu` é montada por `Assets/Editor/GeradorDoMenu.cs`, pelo menu **O Vigia** na
+barra superior da Unity. Faz sentido ali porque a tela é só texto e um cubo: mudar um
+nome ou reposicionar o painel é uma linha e um clique, e garante que os dois
+integrantes gerem exatamente a mesma cena.
 
 | Item do menu | O que faz |
 |---|---|
-| 1. Criar cena da fase | cria e salva a `01_Fase` do zero |
-| 2. Gerar cenário | regera a fase na cena já aberta |
 | 3. Criar cena do menu | cria e salva a `00_Menu` do zero |
 | 4. Gerar menu | regera o menu na cena já aberta |
 | 5. Registrar cenas no Build Settings | põe `00_Menu` no índice 0 e `01_Fase` no 1 |
 
-Os geradores também criam a layer `Interactive`, os materiais em `Assets/Materiais/`
-e a iluminação. Podem rodar quantas vezes quiser: apagam o grupo anterior
-(`GaleriaGerada` / `MenuGerado`) antes de recriar, então nunca duplicam.
+O gerador apaga o grupo `MenuGerado` antes de recriar, então pode rodar quantas vezes
+quiser sem duplicar. Ele também cria a layer `Interactive` e os materiais em
+`Assets/Materiais/`.
+
+**A fase não tem mais gerador.** O `GeradorDaGaleria.cs` foi removido quando o cenário
+passou a usar os modelos — a `01_Fase` agora se edita na Unity mesmo, como cena normal.
 
 **Como as cenas são geradas, edite-as pelos scripts, não à mão** — uma edição manual
 se perde na próxima vez que alguém rodar o gerador.
@@ -129,9 +135,35 @@ Isso precisa de internet, mas só uma vez.
   declara 26 no manifesto dele, e o Gradle recusa o merge se o app prometer rodar em
   versão mais antiga que uma biblioteca sua. O celular precisa ser Android 8 ou superior.
 - **Package Name**: algo como `com.suadupla.ovigia`
+- **Application Entry Point**: marcar **Activity**, desmarcar **GameActivity**
 
 **Resolution and Presentation**
 - **Default Orientation**: Landscape Left
+
+### O par Activity + AppCompat
+
+Esses dois andam juntos e é fácil quebrar um consertando o outro.
+
+O Cardboard se conecta por JNI à `Activity` clássica do Unity e **não suporta
+GameActivity**, que é o padrão novo do Unity 6. Com GameActivity o app compila
+normalmente, instala, e morre no instante em que abre — sem mensagem, sem log útil.
+
+Mas trocar para Activity sozinho não basta. O `AndroidManifest` do
+`GfxPluginCardboard` declara sua activity com o tema `Theme.AppCompat.NoActionBar`,
+que vem do AndroidX AppCompat. Com GameActivity a Unity trazia essa biblioteca junto;
+com Activity ela some, e o build passa a falhar em `processReleaseResources` com
+*"resource style/Theme.AppCompat.NoActionBar not found"*.
+
+Por isso existe `Assets/Plugins/Android/mainTemplate.gradle`, que declara o AppCompat
+explicitamente. **Não apague esse arquivo** achando que é sobra — sem ele o build não
+passa. E se precisar editá-lo, preserve os tokens `**DEPS**`, `**NDKPATH**`,
+`**APIVERSION**` e companhia: são marcadores que a Unity substitui na hora do build.
+
+| Combinação | Compila | Abre no celular |
+|---|---|---|
+| GameActivity | sim | **não** |
+| Activity, sem AppCompat | **não** | — |
+| Activity + AppCompat | sim | sim |
 
 ### 5. Gerar o APK
 
@@ -164,13 +196,17 @@ Assets/
     Vigia.cs               so anda quando nao esta sendo observado
     BotaoIniciar.cs        botao da tela de entrada
   Editor/
-    UtilGerador.cs         funcoes comuns aos geradores
-    GeradorDaGaleria.cs    monta a fase inteira
+    UtilGerador.cs         funcoes comuns, monta a cabeca VR e a reticula
     GeradorDoMenu.cs       monta a tela de entrada
-  Materiais/               gerados pelos scripts acima
+  Modelos/                 FBX vindos do Blender: galeria, pedestal, vitrine,
+                           porta, Vigia e as 5 reliquias
+  Materiais/               gerados pelo GeradorDoMenu
+  Plugins/Android/
+    mainTemplate.gradle    declara o AndroidX AppCompat (nao apagar)
   Scenes/
-    00_Menu.unity          build index 0
-    01_Fase.unity          build index 1
+    00_Menu.unity          build index 0, gerada por codigo
+    01_Fase.unity          build index 1, montada com os modelos
+  XR/                      loader do Cardboard, por plataforma
 ```
 
 ### Regras que o código segue
@@ -185,8 +221,10 @@ Assets/
 ### Cenário
 
 Galeria em anel de 20 m × 14 m, corredores de 4 m, paredes de 3,5 m. O bloco central
-maciço (12 × 6 m) é o que quebra a linha de visão e dá espaço para o Vigia avançar.
-Cerca de 30 objetos, todos cubos — bem abaixo do teto de 50 mil triângulos.
+maciço é o que quebra a linha de visão e dá espaço para o Vigia avançar — sem ele o
+jogador manteria a estátua no campo de visão o tempo todo e ela nunca sairia do lugar.
+
+Modelada no Blender e importada como FBX, 2.630 triângulos no total.
 
 ---
 
@@ -199,9 +237,9 @@ Cerca de 30 objetos, todos cubos — bem abaixo do teto de 50 mil triângulos.
 | Nome dos integrantes | pronto (6 nomes, JP e Maria Letícia em destaque) |
 | Botão para iniciar o jogo | pronto (cubo verde, mira + botão) |
 | Instruções básicas de controle | pronto (painel do menu) |
-| Uso do player VR/Cardboard | pacote no repo; falta ligar no XR Plug-in Management |
+| Uso do player VR/Cardboard | pronto (loader ligado no Android, `.so` verificado no APK) |
 | Movimentação com o stick do gamepad | pronto |
-| Visão em primeira pessoa pelo movimento do celular | **depende dos passos 1 a 4 acima** |
+| Visão em primeira pessoa pelo movimento do celular | pronto no build; **falta confirmar no visor** |
 | Uso da retícula para mirar | pronto (muda de cor sobre o alvo) |
 | Pelo menos uma interação com a retícula | pronto (5 relíquias, porta e botão do menu) |
 | Uma fase 3D jogável | pronto |
