@@ -1010,7 +1010,7 @@ MonoBehaviour:
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 120
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -2051,7 +2051,7 @@ MonoBehaviour:
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 55
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -2209,12 +2209,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   rota:
-  - {x: -9, y: 0, z: -6}
-  - {x: -9, y: 0, z: 6}
-  - {x: 9, y: 0, z: 6}
-  - {x: 9, y: 0, z: -6}
+  - {x: -9, y: 0, z: -6.45}
+  - {x: -9, y: 0, z: 6.45}
+  - {x: 9, y: 0, z: 6.45}
+  - {x: 9, y: 0, z: -6.45}
   raioDoCanto: 1.2
   alturaDaLinha: 1.2
+  tempoParaDestravar: 0.5
+  duracaoDoDesvio: 0.7
 --- !u!143 &1139068496
 CharacterController:
   m_ObjectHideFlags: 0

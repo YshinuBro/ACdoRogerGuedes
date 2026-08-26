@@ -26,13 +26,17 @@ public class Vigia : MonoBehaviour
     [Header("Rota de contorno")]
     // Encostados na parede de proposito: o meio do corredor e onde estao os
     // pedestais, e um canto dentro de um pedestal trava a estatua ali.
+    //
+    // O z de 6.45 e apertado por motivo: o Pedestal3 vai ate z=5.9 e a face
+    // interna da parede esta em z=7.0. Com raio de corpo 0.35, so passa entre
+    // 6.25 e 6.65. Em z=6 ela raspava no pedestal a cada volta.
     [Tooltip("Os cantos do corredor em anel, na ordem em que se ligam.")]
     [SerializeField] private Vector3[] rota =
     {
-        new Vector3(-9f, 0f, -6f),
-        new Vector3(-9f, 0f,  6f),
-        new Vector3( 9f, 0f,  6f),
-        new Vector3( 9f, 0f, -6f)
+        new Vector3(-9f, 0f, -6.45f),
+        new Vector3(-9f, 0f,  6.45f),
+        new Vector3( 9f, 0f,  6.45f),
+        new Vector3( 9f, 0f, -6.45f)
     };
 
     [Tooltip("Distancia para considerar que chegou num canto.")]
@@ -41,14 +45,26 @@ public class Vigia : MonoBehaviour
     [Tooltip("Altura em que a linha de visao e testada. Acima dos pedestais.")]
     [SerializeField] private float alturaDaLinha = 1.2f;
 
+    [Header("Destravamento")]
+    [Tooltip("Quanto tempo empurrando sem sair do lugar antes de tentar desviar.")]
+    [SerializeField] private float tempoParaDestravar = 0.5f;
+    [Tooltip("Quanto tempo anda de lado ao desviar.")]
+    [SerializeField] private float duracaoDoDesvio = 0.7f;
+
     private CharacterController controlador;
     private float velocidadeVertical;
     private int cantoAtual = -1;
+
+    private Vector3 posicaoAnterior;
+    private float tempoTravado;
+    private float tempoDesviando;
+    private float ladoDoDesvio = 1f;
 
     private void Awake()
     {
         controlador = GetComponent<CharacterController>();
         if (cabecaDoJogador == null && Camera.main != null) cabecaDoJogador = Camera.main.transform;
+        posicaoAnterior = transform.position;
     }
 
     private void Update()
@@ -58,12 +74,22 @@ public class Vigia : MonoBehaviour
 
         Vector3 ateOJogador = Achatar(alvo.position - transform.position);
         Vector3 passo = Vector3.zero;
+        bool queriaAndar = false;
 
         if (!EstouSendoObservado() && ateOJogador.magnitude > distanciaDeToque)
         {
             Vector3 direcao = ParaOndeIr();
+
+            // Encravou em quina de pedestal: anda de lado por um instante ate soltar.
+            if (tempoDesviando > 0f)
+            {
+                tempoDesviando -= Time.deltaTime;
+                direcao = Vector3.Cross(Vector3.up, direcao.normalized) * ladoDoDesvio;
+            }
+
             if (direcao.sqrMagnitude > 0.001f)
             {
+                queriaAndar = true;
                 passo = direcao.normalized * velocidade;
                 Encarar(direcao);
             }
@@ -80,10 +106,38 @@ public class Vigia : MonoBehaviour
 
         controlador.Move(passo * Time.deltaTime);
 
+        VerificarTravamento(queriaAndar);
+
         Vector3 depois = Achatar(alvo.position - transform.position);
         if (depois.magnitude <= distanciaDeToque && GerenciadorJogo.Instancia != null)
         {
             GerenciadorJogo.Instancia.Derrota();
+        }
+    }
+
+    // Compara o quanto ela queria andar com o quanto andou de fato. Empurrar
+    // uma quina sem sair do lugar dispara um desvio lateral, alternando o lado
+    // a cada tentativa para nao insistir sempre no mesmo.
+    private void VerificarTravamento(bool queriaAndar)
+    {
+        float andou = Achatar(transform.position - posicaoAnterior).magnitude;
+        posicaoAnterior = transform.position;
+
+        if (!queriaAndar || tempoDesviando > 0f)
+        {
+            tempoTravado = 0f;
+            return;
+        }
+
+        float esperado = velocidade * Time.deltaTime * 0.4f;
+        if (andou < esperado) tempoTravado += Time.deltaTime;
+        else tempoTravado = 0f;
+
+        if (tempoTravado >= tempoParaDestravar)
+        {
+            tempoTravado = 0f;
+            tempoDesviando = duracaoDoDesvio;
+            ladoDoDesvio = -ladoDoDesvio;
         }
     }
 
