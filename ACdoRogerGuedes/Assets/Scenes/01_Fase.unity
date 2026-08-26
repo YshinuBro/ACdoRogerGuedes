@@ -2201,8 +2201,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   alvo: {fileID: 266151924}
   cabecaDoJogador: {fileID: 1577871401}
-  velocidade: 2.6
-  ganhoPorReliquia: 0.15
+  velocidadePorReliquia:
+  - 2.6
+  - 3.2
+  - 3.8
+  - 4.4
+  - 5.6
+  - 7.2
   distanciaDeToque: 1.3
   gravidade: -12
   anguloDeVisao: 65
@@ -2728,6 +2733,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1401319397}
   - component: {fileID: 1401319398}
+  - component: {fileID: 1401319399}
   m_Layer: 0
   m_Name: Gerenciador
   m_TagString: Untagged
@@ -2774,6 +2780,24 @@ MonoBehaviour:
   esperaAposDerrota: 4
   esperaAposVitoria: 5
   cenaDoMenu: 00_Menu
+--- !u!114 &1401319399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1401319396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 094e2c18c117a524fb489c30299ca6e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tempoAteOVermelho: 150
+  adiantoPorReliquia: 12
+  corFinalDasLuzes: {r: 1, g: 0.18, b: 0.1, a: 1}
+  fogFinal: {r: 0.09, g: 0.008, b: 0.008, a: 1}
+  ambienteFinal: {r: 0.11, g: 0.02, b: 0.02, a: 1}
+  intensidadeMaxima: 0.85
 --- !u!1 &1499124673
 GameObject:
   m_ObjectHideFlags: 0

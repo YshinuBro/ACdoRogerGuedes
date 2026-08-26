@@ -15,13 +15,23 @@ public class Vigia : MonoBehaviour
     [SerializeField] private Transform cabecaDoJogador;
 
     [Header("Perseguicao")]
-    // Mais rapida que o jogador (2.2) de proposito. Com uma estatua mais lenta
-    // da para simplesmente correr e nunca olhar para tras, e a mecanica inteira
-    // vira enfeite. Sendo mais rapida, olhar deixa de ser opcao.
-    [SerializeField] private float velocidade = 2.6f;
-
-    [Tooltip("Quanto ela acelera a cada reliquia coletada. A tensao sobe justo quando falta atravessar ate a porta.")]
-    [SerializeField] private float ganhoPorReliquia = 0.15f;
+    // Velocidade por numero de reliquias ja coletadas. O jogador anda a 2.2, e
+    // a estatua e sempre mais rapida de proposito: com um perseguidor mais lento
+    // da para so correr e nunca olhar para tras, e a mecanica vira enfeite.
+    //
+    // A curva nao e linear. Ela abre folga no comeco, dobra a velocidade do
+    // jogador na terceira reliquia e fica assustadora na quinta, que e quando
+    // so falta atravessar a galeria ate a porta.
+    [Tooltip("Indice = reliquias coletadas. Jogador anda a 2.2 m/s.")]
+    [SerializeField] private float[] velocidadePorReliquia =
+    {
+        2.6f,   // 0 coletadas  +18%
+        3.2f,   // 1            +45%
+        3.8f,   // 2            +73%
+        4.4f,   // 3            dobro do jogador
+        5.6f,   // 4            +155%
+        7.2f    // 5            mais de tres vezes
+    };
 
     [SerializeField] private float distanciaDeToque = 1.3f;
     [SerializeField] private float gravidade = -12f;
@@ -76,8 +86,10 @@ public class Vigia : MonoBehaviour
     {
         get
         {
+            if (velocidadePorReliquia == null || velocidadePorReliquia.Length == 0) return 2.6f;
             int coletadas = GerenciadorJogo.Instancia != null ? GerenciadorJogo.Instancia.Coletadas : 0;
-            return velocidade + coletadas * ganhoPorReliquia;
+            int i = Mathf.Clamp(coletadas, 0, velocidadePorReliquia.Length - 1);
+            return velocidadePorReliquia[i];
         }
     }
 
