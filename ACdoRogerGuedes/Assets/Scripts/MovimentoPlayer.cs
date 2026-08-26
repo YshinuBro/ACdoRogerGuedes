@@ -25,9 +25,11 @@ public class MovimentoPlayer : MonoBehaviour
 
     private void Update()
     {
-        Vector2 entrada = LerEntrada();
+        // Fim de jogo congela o jogador por completo, inclusive a gravidade.
+        // Zerar so a entrada deixava ele continuar caindo durante a tela de fim.
+        if (GerenciadorJogo.Instancia != null && GerenciadorJogo.Instancia.JogoTerminou) return;
 
-        if (GerenciadorJogo.Instancia != null && GerenciadorJogo.Instancia.JogoTerminou) entrada = Vector2.zero;
+        Vector2 entrada = LerEntrada();
 
         Vector3 frente = Vector3.forward;
         Vector3 lado = Vector3.right;

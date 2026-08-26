@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -15,10 +15,17 @@ public class GerenciadorJogo : MonoBehaviour
     [SerializeField] private Text textoContador;
     [SerializeField] private Text textoMensagem;
 
+    [Header("Tela de fim")]
+    [SerializeField] private GameObject painelDeFim;
+    [SerializeField] private Image fundoDeFim;
+    [SerializeField] private Text tituloDeFim;
+    [SerializeField] private Text subtituloDeFim;
+    [SerializeField] private float duracaoDoEscurecimento = 1.2f;
+
     [Header("Tempos")]
     [SerializeField] private float duracaoDaMensagem = 3f;
-    [SerializeField] private float esperaAposDerrota = 4f;
-    [SerializeField] private float esperaAposVitoria = 5f;
+    [SerializeField] private float esperaAposDerrota = 5f;
+    [SerializeField] private float esperaAposVitoria = 6f;
 
     [Header("Cenas")]
     [SerializeField] private string cenaDoMenu = "00_Menu";
@@ -26,6 +33,7 @@ public class GerenciadorJogo : MonoBehaviour
     private int coletadas;
     private float tempoDaMensagem;
     private float tempoDaTroca;
+    private float tempoDeFim;
     private bool trocandoDeCena;
     private bool voltarParaOMenu;
 
@@ -45,6 +53,7 @@ public class GerenciadorJogo : MonoBehaviour
 
     private void Start()
     {
+        if (painelDeFim != null) painelDeFim.SetActive(false);
         AtualizarContador();
         MostrarMensagem("Colete as " + totalDeReliquias + " relíquias e fuja pela porta.");
     }
@@ -57,15 +66,23 @@ public class GerenciadorJogo : MonoBehaviour
             if (tempoDaMensagem <= 0f && textoMensagem != null) textoMensagem.text = "";
         }
 
-        if (trocandoDeCena)
+        if (!trocandoDeCena) return;
+
+        // escurece a tela por cima de tudo, para o fim ter peso
+        tempoDeFim += Time.deltaTime;
+        if (fundoDeFim != null)
         {
-            tempoDaTroca -= Time.deltaTime;
-            if (tempoDaTroca <= 0f)
-            {
-                trocandoDeCena = false;
-                if (voltarParaOMenu) SceneManager.LoadScene(cenaDoMenu);
-                else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            }
+            float a = Mathf.Clamp01(tempoDeFim / Mathf.Max(0.01f, duracaoDoEscurecimento));
+            Color c = fundoDeFim.color;
+            fundoDeFim.color = new Color(c.r, c.g, c.b, a);
+        }
+
+        tempoDaTroca -= Time.deltaTime;
+        if (tempoDaTroca <= 0f)
+        {
+            trocandoDeCena = false;
+            if (voltarParaOMenu) SceneManager.LoadScene(cenaDoMenu);
+            else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
@@ -82,22 +99,41 @@ public class GerenciadorJogo : MonoBehaviour
 
     public void Vitoria()
     {
-        if (trocandoDeCena) return;
-
-        MostrarMensagem("VOCÊ ESCAPOU DA GALERIA!", esperaAposVitoria);
-        voltarParaOMenu = true;
-        trocandoDeCena = true;
-        tempoDaTroca = esperaAposVitoria;
+        Terminar(
+            "VOCÊ ESCAPOU",
+            "As " + totalDeReliquias + " relíquias saíram com você.\nO Vigia voltou a ser só uma estátua.",
+            new Color(1f, 0.85f, 0.4f),
+            true,
+            esperaAposVitoria);
     }
 
     public void Derrota()
     {
+        Terminar(
+            "O VIGIA TE ALCANÇOU",
+            "Ele só se move quando ninguém está olhando.\nDesta vez, você olhou para o lado.",
+            new Color(0.9f, 0.3f, 0.25f),
+            false,
+            esperaAposDerrota);
+    }
+
+    // Fim de jogo: congela o jogador, escurece a tela e mostra o desfecho.
+    private void Terminar(string titulo, string subtitulo, Color cor, bool venceu, float espera)
+    {
         if (trocandoDeCena) return;
 
-        MostrarMensagem("O VIGIA TE ALCANÇOU...", esperaAposDerrota);
-        voltarParaOMenu = false;
-        trocandoDeCena = true;
-        tempoDaTroca = esperaAposDerrota;
+        trocandoDeCena = true;   // MovimentoPlayer e Vigia param de agir a partir daqui
+        voltarParaOMenu = venceu;
+        tempoDaTroca = espera;
+        tempoDeFim = 0f;
+
+        if (textoMensagem != null) textoMensagem.text = "";
+        if (textoContador != null) textoContador.text = "";
+
+        if (painelDeFim != null) painelDeFim.SetActive(true);
+        if (fundoDeFim != null) fundoDeFim.color = new Color(0f, 0f, 0f, 0f);
+        if (tituloDeFim != null) { tituloDeFim.text = titulo; tituloDeFim.color = cor; }
+        if (subtituloDeFim != null) subtituloDeFim.text = subtitulo;
     }
 
     public void MostrarMensagem(string texto)
@@ -107,6 +143,7 @@ public class GerenciadorJogo : MonoBehaviour
 
     public void MostrarMensagem(string texto, float duracao)
     {
+        if (trocandoDeCena) return;
         if (textoMensagem != null) textoMensagem.text = texto;
         tempoDaMensagem = duracao;
     }
