@@ -79,3 +79,7 @@ crashlytics-build.properties
 
 # backup local criado ao instalar o MCP da Unity
 manifest.json.bak-*
+
+# capturas geradas pelo MCP da Unity
+ACdoRogerGuedes/Assets/Screenshots/
+ACdoRogerGuedes/Assets/Screenshots.meta
