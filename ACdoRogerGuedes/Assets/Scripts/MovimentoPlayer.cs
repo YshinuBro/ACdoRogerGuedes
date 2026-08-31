@@ -69,6 +69,12 @@ public class MovimentoPlayer : MonoBehaviour
             if (entrada.magnitude < zonaMorta) entrada = Vector2.zero;
         }
 
+        // Joystick na tela, para quem esta sem gamepad.
+        if (entrada == Vector2.zero && JoystickNaTela.Instancia != null)
+        {
+            entrada = JoystickNaTela.Instancia.Direcao;
+        }
+
         // Fallback de teclado, so para testar dentro do Editor.
         if (entrada == Vector2.zero)
         {

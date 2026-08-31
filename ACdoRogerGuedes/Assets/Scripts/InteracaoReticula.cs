@@ -54,8 +54,16 @@ public class InteracaoReticula : MonoBehaviour
             if (controle.rightTrigger.wasPressedThisFrame) return true;
         }
 
+        // Toque na metade DIREITA interage. A esquerda e do joystick na tela.
         Touchscreen tela = Touchscreen.current;
-        if (tela != null && tela.primaryTouch.press.wasPressedThisFrame) return true;
+        if (tela != null)
+        {
+            foreach (var t in tela.touches)
+            {
+                if (t.phase.ReadValue() != UnityEngine.InputSystem.TouchPhase.Began) continue;
+                if (JoystickNaTela.ToqueDeInteracao(t.position.ReadValue())) return true;
+            }
+        }
 
         Keyboard teclado = Keyboard.current;
         if (teclado != null && teclado.spaceKey.wasPressedThisFrame) return true;
