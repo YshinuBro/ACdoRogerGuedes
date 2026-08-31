@@ -2734,6 +2734,7 @@ GameObject:
   - component: {fileID: 1401319397}
   - component: {fileID: 1401319398}
   - component: {fileID: 1401319399}
+  - component: {fileID: 1401319400}
   m_Layer: 0
   m_Name: Gerenciador
   m_TagString: Untagged
@@ -2798,6 +2799,18 @@ MonoBehaviour:
   fogFinal: {r: 0.09, g: 0.008, b: 0.008, a: 1}
   ambienteFinal: {r: 0.11, g: 0.02, b: 0.02, a: 1}
   intensidadeMaxima: 0.85
+--- !u!114 &1401319400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1401319396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7131ea37d8b880948a0aa8945f0673d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1499124673
 GameObject:
   m_ObjectHideFlags: 0
