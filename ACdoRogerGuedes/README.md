@@ -7,6 +7,9 @@ Você está numa galeria de museu escura. Colete as 5 relíquias mirando nelas c
 retícula e depois mire na porta de saída para escapar. Uma estátua — o Vigia —
 **só se move quando você não está olhando para ela**. Se ela te alcançar, é derrota.
 
+> Estudo de como levar o jogo para Quest ou PSVR2: [PLANO-VR.md](PLANO-VR.md).
+> Nada dele foi implementado — é planejamento para depois da entrega.
+
 ---
 
 ## Controles

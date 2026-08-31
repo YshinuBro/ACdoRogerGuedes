@@ -83,3 +83,7 @@ manifest.json.bak-*
 # capturas geradas pelo MCP da Unity
 ACdoRogerGuedes/Assets/Screenshots/
 ACdoRogerGuedes/Assets/Screenshots.meta
+
+# gerados pelo pacote de testes de performance da Unity
+ACdoRogerGuedes/Assets/Resources/PerformanceTestRun*.json
+ACdoRogerGuedes/Assets/Resources/PerformanceTestRun*.json.meta
